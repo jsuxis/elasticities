@@ -25,37 +25,6 @@ program define cardlemieux, rclass
 			local gap_`y'_`a' = b_`y'_`a'[1,2]
 			replace wgt = `var_`y'_`a'' if jahr==`y' & altersgr==`a'  
 			replace wagegap = `gap_`y'_`a'' if jahr==`y' & altersgr==`a' 
-			/*reg loglohn i.skilled##i.geschl age if jahr==`y' & altersgr==`a', robust
-			mat covar_`y'_`a' = e(V)
-			local var_`y'_`a' = 1/covar_`y'_`a'[2,2]
-			mat b_`y'_`a' = e(b)
-			local gap_men_`y'_`a' = b_`y'_`a'[1,2]
-			local gap_women_`y'_`a' = b_`y'_`a'[1,2]+b_`y'_`a'[1,8]
-			replace wgt = `var_`y'_`a'' if jahr==`y' & altersgr==`a'  
-			replace wagegap = `gap_men_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==0
-			replace wagegap = `gap_women_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==1	*//*
-			reg loglohn skilled age if jahr==`y' & altersgr==`a' & geschl==1, robust
-			mat covar_`y'_`a' = e(V)
-			local var_`y'_`a' = 1/covar_`y'_`a'[1,1]
-			mat b_`y'_`a' = e(b)
-			local gap_men_`y'_`a' = b_`y'_`a'[1,1]
-			local men_u_`y'_`a' = b_`y'_`a'[1,2]*age +b_`y'_`a'[1,3] 
-			local men_s_`y'_`a' = b_`y'_`a'[1,1] + b_`y'_`a'[1,2]*age +b_`y'_`a'[1,3] 
-			replace wgt = `var_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==1
-			reg loglohn skilled age if jahr==`y' & altersgr==`a' & geschl==2, robust
-			mat covar_`y'_`a' = e(V)
-			local var_`y'_`a' = 1/covar_`y'_`a'[1,1]
-			mat b_`y'_`a' = e(b)
-			local gap_women_`y'_`a' = b_`y'_`a'[1,1]
-			local women_u_`y'_`a' = b_`y'_`a'[1,2]*age +b_`y'_`a'[1,3] 
-			local women_s_`y'_`a' = b_`y'_`a'[1,1] + b_`y'_`a'[1,2]*age +b_`y'_`a'[1,3]
-			replace wgt = `var_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==2
-			replace wagegap = `gap_men_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==1
-			replace wagegap = `gap_women_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==2
-			replace wage_u = `men_u_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==1
-			replace wage_u = `women_u_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==2
-			replace wage_s = `men_s_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==1
-			replace wage_s = `women_s_`y'_`a'' if jahr==`y' & altersgr==`a' & geschl==2*/
 			}
 		}
 	
@@ -82,7 +51,7 @@ program define cardlemieux, rclass
 	local sigA = -temp[1,1]
 	gen outcome_u = wage_u + `sigA'*stundeges20
 	gen outcome_s = wage_s + `sigA'*stundeges21
-
+	// the following only works for given amount of t, adjust submatrices as needed
 	reg outcome_u i.jahr ibn.altersgr, nocon
 	mat alpha = e(b)
 	mat alpha = alpha[1,26..32]
@@ -127,7 +96,6 @@ program define cardlemieux, rclass
 	return scalar sigmaE = `sigE'
 	return scalar sigmaA = `sigA'
 	return scalar trend = `r3'
-	*use bootstrap_input.dta, clear
 	restore
 end
 

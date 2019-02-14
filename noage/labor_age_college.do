@@ -1,4 +1,6 @@
+// Put correct path here!
 cd Z:\OLG_CGE_Model\code\elasticities\noage
+
 cap restore
 use Datensatz1991_2017.dta, clear
 
@@ -21,24 +23,16 @@ drop if jahr2==.
 rename jahr2 jahr
 
 replace BQU2=BQU1 if jahr==1991
-recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1991
+recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1995
 
 gen skilled = .
 replace skilled = .
-replace skilled = 0 if /*BQU2 >=1 & BQU2 <= 4*/ BQU2 == 4
+replace skilled = 0 if BQU2 == 4
 replace skilled = 1 if BQU2 == 10
 drop if skilled ==.
-/*
-replace skilled = .
-replace skilled = 0 if BQU2 <=5 & BQU2 > 0
-replace skilled = 1 if BQU2 >= 6 & BQU2 <=10
-drop if skilled ==.
-*/
 
 keep if age >= 15 & age <= 65
 drop if stundeges2 == . | stundeges2 < 0
-
-*bysort skilled: egen wgt = mean(lohn)
 
 preserve
 
@@ -54,105 +48,9 @@ gen loglabor = log(labor)
 gen loglabor_h = log(stundeges21)
 gen loglabor_l = log(stundeges20)
 
-line loglabor jahr
-
 gen ind=0
 
 save labor_age_college.dta, replace
 
 restore
 
-/*
-preserve
-
-collapse (sum) stundeges2 (count) n=stundeges2 /*[pw=gew]*/, by(geschl altersgr skilled jahr)
-reshape wide stundeges2 n, i(jahr geschl altersgr) j(skilled)
-drop if n0<=5 | n1<=5
-
-gen labor = stundeges21 / stundeges20
-
-collapse (mean) labor, by(jahr altersgr)
-
-gen loglabor = log(labor)
-
-forval i=1/9 {
-	line loglabor jahr if altersgr==`i', name(a`i', replace) nodraw
-	}
-
-*gr combine a1 a2 a3 a4 a5 a6 a7 a8 a9
-
-* ==> First Evidence that dividing by age doesn't make sense
-
-restore
-preserve
-
-tempfile a b
-
-drop if BMU3==1
-gen ind = .
-replace ind = 1 if BMU3 >=2 & BMU3<=5
-replace ind = 2 if BMU3 == 6
-replace ind = 3 if BMU3 >= 7 & BMU3 <= 9
-replace ind = 4 if BMU3 == 10
-replace ind = 5 if (BMU3 >= 11 & BMU3 <= 16) | (BMU3 >= 18 & BMU3 <=20)
-replace ind = 6 if BMU3 == 17
-***
-replace ind = 3 if BMU3 == 7
-replace ind = 4 if BMU3 == 8
-replace ind = 5 if BMU3 == 9
-replace ind = 6 if BMU3 == 10
-replace ind = 7 if BMU3 == 11 | BMU3 == 12
-replace ind = 8 if BMU3 >= 13 & BMU3 <=16 | BMU3 >= 18 & BMU3 <= 21
-replace ind = 9 if BMU3 == 17
-***
-drop if ind==.
-
-
-collapse (sum) stundeges2 /*[pw=gew]*/, by(geschl altersgr skilled jahr ind)
-save `a'
-restore
-preserve
-drop if BMU3==1
-gen ind = .
-replace ind = 1 if BMU3 >=2 & BMU3<=5
-replace ind = 2 if BMU3 == 6
-replace ind = 3 if BMU3 >= 7 & BMU3 <= 9
-replace ind = 4 if BMU3 == 10
-replace ind = 5 if (BMU3 >= 11 & BMU3 <= 16) | (BMU3 >= 18 & BMU3 <=20)
-replace ind = 6 if BMU3 == 17
-***
-replace ind = 3 if BMU3 == 7
-replace ind = 4 if BMU3 == 8
-replace ind = 5 if BMU3 == 9
-replace ind = 6 if BMU3 == 10
-replace ind = 7 if BMU3 == 11 | BMU3 == 12
-replace ind = 8 if BMU3 >= 13 & BMU3 <=16 | BMU3 >= 18 & BMU3 <= 21
-replace ind = 9 if BMU3 == 17
-***
-drop if ind==.
-
-collapse (count) n=stundeges2, by(geschl altersgr skilled jahr ind)
-merge 1:1 geschl altersgr skilled jahr ind using `a', nogen 
-
-reshape wide stundeges2 n, i(jahr ind geschl altersgr) j(skilled)
-drop if n0<=5 | n1<=5 | n0==. | n1==.
-
-gen labor = stundeges21 / stundeges20
-
-collapse (mean) labor, by(jahr ind)
-
-gen loglabor = log(labor)
-
-forval i=1/6 {
-	line loglabor jahr if ind==`i', name(a`i', replace) nodraw
-	}
-
-*gr combine a1 a2 a3 a4 a5 a6 
-
-append using labor_ges_yeardummy.dta
-
-
-save labor_age.dta, replace
-
-restore
-*/

@@ -1,4 +1,6 @@
+// Put correct path here!
 cd Z:\OLG_CGE_Model\code\elasticities\noage
+
 cap restore
 use Datensatz1991_2017.dta, clear
 
@@ -21,11 +23,11 @@ drop if jahr2==.
 rename jahr2 jahr
 
 replace BQU2=BQU1 if jahr==1991
-recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1991
+recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1995
 
 gen skilled = .
 replace skilled = .
-replace skilled = 0 if /*BQU2 >=1 & BQU2 <= 4*/ BQU2 == 4
+replace skilled = 0 if BQU2 == 4
 replace skilled = 1 if BQU2 == 10
 drop if skilled ==.
 
@@ -39,24 +41,16 @@ replace ind = 5 if BMU3 == 10
 replace ind = 6 if (BMU3 >= 14 & BMU3 <= 16) | (BMU3 >= 18 & BMU3 <=20) | BMU3==9
 replace ind = 7 if BMU3 == 17 
 drop if ind==.
-/*
-replace skilled = .
-replace skilled = 0 if BQU2 <=5 & BQU2 > 0
-replace skilled = 1 if BQU2 >= 6 & BQU2 <=10
-drop if skilled ==.
-*/
 
 keep if age >= 15 & age <= 65
 drop if stundeges2 == . | stundeges2 < 0
-
-*bysort skilled: egen wgt = mean(lohn)
 
 preserve
 
 collapse (sum) stundeges2 (count) n=stundeges2 /*[pw=gew]*/, by(geschl skilled jahr ind)
 reshape wide stundeges2 n, i(jahr geschl ind) j(skilled)
 replace stundeges21 = 0 if n1 <5 | n1==.
-*drop if n0<=5 | n1<=5 | n0==. | n1==.
+drop if n0<=5 | n1<=5 | n0==. | n1==.
 
 gen labor = stundeges21 / stundeges20
 
@@ -65,9 +59,6 @@ collapse (mean) stundeges2* labor, by(jahr ind)
 gen loglabor = log(labor)
 gen loglabor_h = log(stundeges21)
 gen loglabor_l = log(stundeges20)
-
-line loglabor jahr
-
 
 save labor_age_ind_college.dta, replace
 

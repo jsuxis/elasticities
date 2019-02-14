@@ -27,37 +27,6 @@ program define cardlemieuxind, rclass
 				local gap_`y'_`a'_`i' = b_`y'_`a'_`i'[1,2]
 				replace wgt = `var_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & ind==`i'  
 				replace wagegap = `gap_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & ind==`i'
-				/*reg loglohn i.skilled##i.geschl age if jahr==`y' & altersgr==`a' & ind==`i', robust
-			mat covar_`y'_`a'_`i' = e(V)
-			local var_`y'_`a'_`i' = 1/covar_`y'_`a'_`i'[2,2]
-			mat b_`y'_`a'_`i' = e(b)
-			local gap_men_`y'_`a'_`i' = b_`y'_`a'_`i'[1,2]
-			local gap_women_`y'_`a'_`i' = b_`y'_`a'_`i'[1,2]+b_`y'_`a'_`i'[1,8]
-			replace wgt = `var_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & ind==`i'  
-			replace wagegap = `gap_men_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==0 & ind==`i'
-				replace wagegap = `gap_women_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==1 & ind==`i'	*//*
-				reg loglohn skilled age i.geschl if jahr==`y' & altersgr==`a' & ind==`i', robust
-				mat covar_`y'_`a'_`i' = e(V)
-				local var_`y'_`a'_`i' = 1/covar_`y'_`a'_`i'[1,1]
-				mat b_`y'_`a'_`i' = e(b)
-				local gap_`y'_`a'_`i' = b_`y'_`a'_`i'[1,1]
-				local u_`y'_`a'_`i' = b_`y'_`a'_`i'[1,2]*age +b_`y'_`a'_`i'[1,3] 
-				cap local men_s_`y'_`a'_`i' = b_`y'_`a'_`i'[1,1] + b_`y'_`a'_`i'[1,2]*age +b_`y'_`a'_`i'[1,3] 
-				cap replace wgt = `var_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==1 & ind==`i'
-				cap reg loglohn skilled age if jahr==`y' & altersgr==`a' & geschl==2 & ind==`i', robust
-				cap mat covar_`y'_`a'_`i' = e(V)
-				cap local var_`y'_`a'_`i' = 1/covar_`y'_`a'_`i'[1,1]
-				cap mat b_`y'_`a'_`i' = e(b)
-				cap local gap_women_`y'_`a'_`i' = b_`y'_`a'_`i'[1,1]
-				cap local women_u_`y'_`a'_`i' = b_`y'_`a'_`i'[1,2]*age +b_`y'_`a'_`i'[1,3] 
-				cap local women_s_`y'_`a'_`i' = b_`y'_`a'_`i'[1,1] + b_`y'_`a'_`i'[1,2]*age +b_`y'_`a'_`i'[1,3]
-				cap replace wgt = `var_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==2 & ind==`i'
-				cap replace wagegap = `gap_men_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==1 & ind==`i'
-				cap replace wagegap = `gap_women_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==2 & ind==`i'
-				cap replace wage_u = `men_u_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==1 & ind==`i'
-				cap replace wage_u = `women_u_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==2 & ind==`i'
-				cap replace wage_s = `men_s_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==1 & ind==`i'
-				cap replace wage_s = `women_s_`y'_`a'_`i'' if jahr==`y' & altersgr==`a' & geschl==2 & ind==`i'*/		
 				}
 			}
 		}
@@ -92,7 +61,7 @@ program define cardlemieuxind, rclass
 		local sigA_`i' = -temp_`i'[1,1]
 		replace outcome_u = wage_u + `sigA_`i''*stundeges20 if ind == `i'
 		replace outcome_s = wage_s + `sigA_`i''*stundeges21 if ind == `i'
-		
+		// the following only works for given amount of t, adjust submatrices as needed		
 		reg outcome_u i.jahr ibn.altersgr if ind == `i', nocon
 		mat alpha_`i' = e(b)
 		mat alpha_`i' = alpha_`i'[1,14..20]
@@ -110,7 +79,7 @@ program define cardlemieuxind, rclass
 	gen L = .
 	gen H = .
 	drop if ind == 0
-
+	// matacode is also dependent on t, adjust this too
 	forval i=1/7 {
 		mata: matacode_ind`i'()
 		}
@@ -123,7 +92,6 @@ program define cardlemieuxind, rclass
 	merge m:1 jahr ind using age_2step_ind.dta, nogen update
 	append using firststep.dta
 	merge m:1 ind jahr  using age_2step.dta, update
-*	keep if altersgr >1 & altersgr <9
 	gen ratio1 = log(H/L)
 	gen ratio2 = loglabor - ratio1
 	sort jahr ind
@@ -152,8 +120,6 @@ program define cardlemieuxind, rclass
 		return scalar trend_`i' = `r3'
 		}
 	
-
-	*use bootstrap_input.dta, clear
 	restore
 end
 

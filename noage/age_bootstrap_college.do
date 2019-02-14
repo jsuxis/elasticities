@@ -18,24 +18,7 @@ program define cardlemieux, rclass
 		local gap_`y'_`a' = b_`y'_`a'[1,2]
 		replace wgt = `var_`y'_`a'' if jahr==`y' 
 		replace wagegap = `gap_`y'_`a'' if jahr==`y' 
-/*		reg loglohn skilled age i.geschl age2 if jahr==`y', robust
-			mat covar_`y' = e(V)
-			local var_`y' = 1/covar_`y'[1,1]
-			mat b_`y' = e(b)
-			local gap_`y' = b_`y'[1,1]
-			local men_u_`y' = b_`y'[1,5]
-			local women_u_`y' = b_`y'[1,5]+b_`y'[1,4]
-			local men_s_`y' = b_`y'[1,5]+b_`y'[1,1]
-			local women_s_`y' = b_`y'[1,5]+b_`y'[1,4]+b_`y'[1,1]		
-			display `var_`y''
-			display `gap_`y''
-			replace wgt = `var_`y'' if jahr==`y' 
-			replace wagegap = `gap_`y'' if jahr==`y' 
-			replace wage_u = `men_u_`y'' if jahr==`y' & geschl==1
-			replace wage_u = `women_u_`y'' if jahr==`y' & geschl==2
-			replace wage_s = `men_s_`y'' if jahr==`y' & geschl==1
-			replace wage_s = `women_s_`y'' if jahr==`y' & geschl==2	*/			
-			}
+		}
 			
 	collapse (mean) wagegap wgt wage_u wage_s, by(jahr)
 	gen ind = 0

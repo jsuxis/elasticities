@@ -19,23 +19,6 @@ program define cardlemieuxind, rclass
 			local gap_`y'_`i' = b_`y'_`i'[1,2]
 			replace wgt = `var_`y'_`i'' if jahr==`y' & ind==`i'  
 			replace wagegap = `gap_`y'_`i'' if jahr==`y' & ind==`i' 
-/*			reg loglohn skilled age i.geschl age2 if jahr==`y' & ind==`i', robust
-				mat covar_`y'_`i' = e(V)
-				local var_`y'_`i' = 1/covar_`y'_`i'[1,1]
-				mat b_`y'_`i' = e(b)
-				local gap_`y'_`i' = b_`y'_`i'[1,1]
-				local men_u_`y'_`i' = b_`y'_`i'[1,5]
-				local women_u_`y'_`i' = b_`y'_`i'[1,5]+b_`y'_`i'[1,4]
-				local men_s_`y'_`i' = b_`y'_`i'[1,5]+b_`y'_`i'[1,1]
-				local women_s_`y'_`i' = b_`y'_`i'[1,5]+b_`y'_`i'[1,4]+b_`y'_`i'[1,1]		
-				display `var_`y'_`i''
-				display `gap_`y'_`i''
-				replace wgt = `var_`y'_`i'' if jahr==`y' & ind==`i' 
-				replace wagegap = `gap_`y'_`i'' if jahr==`y' & ind==`i'
-				replace wage_u = `men_u_`y'_`i'' if jahr==`y' & ind==`i' & geschl==1
-				replace wage_u = `women_u_`y'_`i'' if jahr==`y' & ind==`i' & geschl==2
-				replace wage_s = `men_s_`y'_`i'' if jahr==`y' & ind==`i' & geschl==1
-				replace wage_s = `women_s_`y'_`i'' if jahr==`y' & ind==`i' & geschl==2		*/
 			}
 		}
 	
@@ -57,8 +40,8 @@ program define cardlemieuxind, rclass
 
 
 	forval i=1/7 {
-		ivregress 2sls logwage t (loglabor = loglabortotal)  [aw=wgt] if ind==`i'
-		
+		ivreg2 logwage t (loglabor = loglabortotal)  [aw=wgt] if ind==`i', first liml
+		scalar F_`i' = e(widstat)
 		mat betas = e(b)
 		mat list betas
 		local r1 = betas[1,1]
@@ -69,6 +52,7 @@ program define cardlemieuxind, rclass
 		display _newline "Sigma A Industry `i': `sigA_`i''"
 		return scalar sigE_coll_`i' = `sigE_`i''
 		return scalar Trend_`i' = `sigA_`i''
+		return scalar F_`i' = F_`i'
 		}
 	
 
