@@ -104,8 +104,8 @@ program define cardlemieuxind, rclass
 
 
 	forval i=1/7 {
-		ivregress 2sls logwage t t2 i.altersgr (ratio1 ratio2 = loglabortotal loglabortotal2 )  [aw=wgt] if ind==`i'
-		
+		ivreg2 logwage t t2 i.altersgr (ratio1 ratio2 = loglabortotal loglabortotal2 )  [aw=wgt] if ind==`i', liml
+		scalar F_`i' = e(widstat)
 		mat betas = e(b)
 		mat list betas
 		local r1 = betas[1,1]
@@ -118,6 +118,7 @@ program define cardlemieuxind, rclass
 		return scalar sigmaE_`i' = `sigE_`i''
 		return scalar sigmaA_`i' = `sigA_`i''
 		return scalar trend_`i' = `r3'
+		return scalar F_`i' = F_`i'
 		}
 	
 	restore

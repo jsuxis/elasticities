@@ -23,7 +23,7 @@ replace ind = 6 if (BMU3 >= 14 & BMU3 <= 16) | (BMU3 >= 18 & BMU3 <=20) | BMU3==
 replace ind = 7 if BMU3 == 17 
 drop if ind==.
 
-/*
+
 gen jahr2=.
 replace jahr2 = 1992 if jahr == 1992 | jahr == 1993
 replace jahr2 = 1994 if jahr == 1994 | jahr == 1995
@@ -38,9 +38,9 @@ replace jahr2 = 2010 if jahr == 2010 | jahr == 2011
 replace jahr2 = 2012 if jahr == 2012 | jahr == 2013
 replace jahr2 = 2014 if jahr == 2014 | jahr == 2015
 replace jahr2 = 2016 if jahr == 2016 | jahr == 2017
-*/
 
 
+/*
 gen jahr2=.
 replace jahr2 = 1992 if jahr == 1992 | jahr == 1993
 replace jahr2 = 1993 if jahr == 1993 | jahr == 1994
@@ -67,7 +67,7 @@ replace jahr2 = 2013 if jahr == 2013 | jahr == 2014
 replace jahr2 = 2014 if jahr == 2014 | jahr == 2015
 replace jahr2 = 2015 if jahr == 2015 | jahr == 2016
 replace jahr2 = 2016 if jahr == 2016 | jahr == 2017
-
+*/
 
 
 drop jahr
@@ -95,7 +95,7 @@ forval i=1/7 {
 cap program drop newboot
 program define newboot, rclass
 	preserve
-	bsample , strata(jahr)
+	bsample //, strata(jahr)
 	cardlemieuxind
 	return scalar sigE_coll_1 = r(sigE_coll_1)
 	return scalar Trend_1 = r(Trend_1)

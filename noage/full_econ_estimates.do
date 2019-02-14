@@ -74,6 +74,15 @@ mat list results
 
 // Industry-Specific Estimations
 do age_bootstrap_ind_college.do
+// Save F-Stats
+quietly cardlemieuxind
+mat f_coll = (0)
+forval i=1/7 {
+	mat f_coll = (f_coll,F_`i')
+	}
+mat f_coll = f_coll[1,2..8]
+mat colnames f_coll = sigE_coll_1 sigE_coll_2 sigE_coll_3 sigE_coll_4 sigE_coll_5 sigE_coll_6 sigE_coll_7
+
 bootstrap sigE_coll_1=r(sigE_coll_1) Trend_1=r(Trend_1) sigE_coll_2=r(sigE_coll_2) Trend_2=r(Trend_2) sigE_coll_3=r(sigE_coll_3) Trend_3=r(Trend_3) sigE_coll_4=r(sigE_coll_4) Trend_4=r(Trend_4) sigE_coll_5=r(sigE_coll_5) Trend_5=r(Trend_5) sigE_coll_6=r(sigE_coll_6) Trend_6=r(Trend_6) sigE_coll_7=r(sigE_coll_7) Trend_7=r(Trend_7), rep(`reps'): cardlemieuxind
 estimates store F2
 matrix betasi = e(b)
@@ -150,6 +159,15 @@ mat list fullresults
 
 // Industry-Specific Estimates
 do age_bootstrap_ind.do
+// Save F-Stats
+quietly cardlemieuxind
+mat f_skill_us = (0)
+forval i=1/7 {
+	mat f_skill_us = (f_skill_us,F_`i')
+	}
+mat f_skill_us = f_skill_us[1,2..8]
+mat colnames f_skill_us = sigE_coll_1 sigE_coll_2 sigE_coll_3 sigE_coll_4 sigE_coll_5 sigE_coll_6 sigE_coll_7
+
 bootstrap sigE_coll_1=r(sigE_coll_1) Trend_1=r(Trend_1) sigE_coll_2=r(sigE_coll_2) Trend_2=r(Trend_2) sigE_coll_3=r(sigE_coll_3) Trend_3=r(Trend_3) sigE_coll_4=r(sigE_coll_4) Trend_4=r(Trend_4) sigE_coll_5=r(sigE_coll_5) Trend_5=r(Trend_5) sigE_coll_6=r(sigE_coll_6) Trend_6=r(Trend_6) sigE_coll_7=r(sigE_coll_7) Trend_7=r(Trend_7), verbose rep(`reps'): cardlemieuxind
 estimates store H2
 matrix betasi = e(b)
