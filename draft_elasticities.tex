@@ -1,0 +1,1013 @@
+\documentclass[]{article}
+\usepackage{authblk}
+\usepackage{pdfpages}
+\usepackage{comment}
+\usepackage{booktabs,tabulary}
+\usepackage{natbib}
+\usepackage{tabu}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{colortbl}
+\usepackage{float}
+\bibliographystyle{chicago}
+\setcitestyle{authoryear, open={(},close={)}}
+\graphicspath{{img/}}
+
+%section{Estout related things}
+% *****************************************************************
+% Estout related things
+% *****************************************************************
+\newcommand{\sym}[1]{\rlap{#1}}% Thanks to David Carlisle
+
+\let\estinput=\input% define a new input command so that we can still flatten the document
+
+\newcommand{\estwide}[3]{
+  \vspace{.75ex}{
+    \begin{tabulary}
+      {0.7\textwidth}{@{\hskip\tabcolsep\extracolsep\fill}l*{#2}{#3}}
+      \toprule
+      \estinput{#1}
+      \bottomrule
+      \addlinespace[.75ex]
+    \end{tabulary}
+  }
+}	
+
+\newcommand{\estauto}[3]{
+  \vspace{.75ex}{
+    \begin{tabular}{l*{#2}{#3}}
+      \toprule
+      \estinput{#1}
+      \bottomrule
+      \addlinespace[.75ex]
+    \end{tabular}
+  }
+}
+
+% Allow line breaks with \\ in specialcells
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+% *****************************************************************
+% Custom subcaptions
+% *****************************************************************
+% Note/Source/Text after Tables
+\newcommand{\figtext}[1]{
+  \vspace{-1.9ex}
+  \captionsetup{justification=justified,font=footnotesize}
+  \caption*{\hspace{6pt}\hangindent=1.5em #1}
+}
+\newcommand{\fignote}[1]{\figtext{\emph{Note:~}~#1}}
+
+\newcommand{\figsource}[1]{\figtext{\emph{Source:~}~#1}}
+
+% Add significance note with \starnote
+\newcommand{\starnote}{\figtext{* $p < 0.1$, ** $p < 0.05$, *** $p < 0.01$. Standard errors in parentheses.}}
+
+% *****************************************************************
+% siunitx
+% *****************************************************************
+\usepackage{siunitx} % centering in tables
+\sisetup{
+  detect-mode,
+  tight-spacing		= true,
+  group-digits		= false ,
+  input-signs		= ,
+  input-symbols		= ( ) [ ] - + *,
+  input-open-uncertainty	= ,
+  input-close-uncertainty	= ,
+  table-align-text-post	= false
+}
+
+
+
+%opening
+\title{Estimating Sector-Specific Elasticities of Substitution in the
+  Swiss Labor Market\footnote{Unfinished Draft. Do not quote or circulate.}}
+\author{Manuel Buchmann}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  Most research on substitutability between high- and low skill labor
+  uses data from the United States. Therefore, high- and low skill
+  labor is usually defined as having attained a college or high school
+  degree respectively. However, this distinction is much less sensible
+  in a country like Switzerland, where, due to its dual education
+  system, many high skill workers do not possess a traditional college
+  degree or even a tertiary education. I suggest an alternative
+  distinction between high- and low skill workers based on occupations
+  and estimate their elasticitiy of substitution in the Swiss economy
+  in general as well as in specific sectors using data from 1991 -
+  2017. I then replicate the estimation with data from the United
+  States and compare the results, concluding that an occupation-based
+  classification of skills is much better suited for analyses in
+  Switzerland, while an education-based classification still gives
+  much more realistic results for the US. Methodologically, I use a
+  \cite{Katz.1992} framework, combining the work of \cite{Card.2001}
+  who allow for imperfect substitution of different age groups with
+  the work of \cite{Blankenau.2011} who develop a method of estimating
+  sector-specific elasticities of substitution.
+\end{abstract}
+
+\newpage
+\section{Introduction}
+\label{intro}
+Information about the substitutability between workers of different
+skill types gives us important insights into the production technology
+in the aggregate economy and specific industries of a country. Such
+information is crucial for realistic macroeconomic models but can also
+be used for qualitative analyses. However, the existing literature on
+this subject is highly influenced by the American system, where it is
+a reasonable simplification to assume that a worker with a college
+degree is a high-skill worker and a worker with a high school degree
+is a low-skill worker, thus defining the skill premium as a college
+premium. This distinction is less reasonable in countries like
+Germany, Switzerland or Austria, where a dual education system is in
+place. In such systems, education in many professions is much more
+applied from a young age on. Often, pupils start an apprenticeship
+directly after compulsory schooling starting around the age of
+15. Apprenticeships usually include some general education and are
+often (but not always) followed by further specialized training, which
+in some cases can take a long time and can be very
+skill-intensive. Apprentices also have the option of completing a
+Federal Vocational Baccalaureate which which is an extended general
+education program and, under some conditions, qualifies for attending
+university. In practice, many (but not all) vocational training
+degrees are well paid, highly regarded and should be considered
+``high-skill''. Identification of these cases in usual data sources
+however, is impossible to do consistently.
+
+Another reason for why education is a bad proxy for skill in
+Switzerland is the creation of the technical colleges
+(``Fachhochschulen'') in 1995. These colleges are ranked on the same
+level as universities, however they are much more applied and often
+attended after completion of an apprenticeship and a so called
+Vocational Baccalaureate. A worker who completed such an education
+should clearly be considered as a high-skill worker. An older worker
+who did not have the opportunity to attend such a college might have
+the same actual skill level, however a researcher might label him as a
+low skill worker because his education was less well defined. These
+technical colleges have been extremely popular and led to a big
+increase in the share of the population with a tertiary degree in
+Switzerland since the year 2000.
+
+Instead of using a college or other tertiary degrees as a classifier
+for skill, I propose a classification based on occupations. More
+specifically, I classify occupations based on the International
+Standard Classification of Occupations version 2008 (ISCO-08) into
+four competence levels. This classification is adopted from the Swiss
+Earnings Structure Survey \citep{SwissStatisticalOffice.2016}. The
+Swiss Federal Statistical Office defines the four competence level as
+follows. Competence level 1 includes tasks with complex problem
+solving and decision making which require a large amount of factual
+and theoretical knowledge in an area of expertise. Competence level 2
+includes complex practical tasks requiring a large amount of knowledge
+in an area of expertise. Competence level 3 includes practical tasks
+like retail, care, data processing and administration, operation of
+machines and eletronical equipment, security service or
+driving. Finally competence level 4 includes simple manual tasks. I
+define competence levels 1 and 2 as high skill, competence levels 3
+and 4 as low skill. A comprehensive list of all occupation groups as
+defined by ISCO-08 and their classification into competence levels can
+be found in the appendix, Tables \ref{tab:occupations_high} and
+\ref{tab:occupations_low}.
+
+By choosing occupations to define the skill level of a worker I
+diverge from the standard economic literature, where agents reveal
+their own skill level through their education choice. The underlying
+microeconomic assumption in the literature is that obtaining a college
+education is too costly for a low skill agent, such that they are
+better off with a less costly education and a lower wage (signaling
+theory, see \cite{Spence.1973}). However, in the case of Switzerland
+it is not straight forward to differentiate between a costly and a
+cheap education. Vocational educations differ widely in terms of skill
+and time required and many workers complete additional, sometimes very
+time consuming courses after finishing their vocational education,
+which may or may not be recognized as a tertiary degree. Additionally,
+obtaining a college degree in Switzerland is not very costly from a
+financial point of view, as it is strongly subsidized. The only
+significant cost is the opportunity cost of not being able to work
+full time during the college education. For all of these reasons I
+argue that a signalling model does not capture the spirit of the Swiss
+solution to information assymetry in the labor market. Thus, I choose
+to not differentiate workers based on their education choices, but
+based on their actual occupations. This shifts the revealing mechanism
+of skill levels to the principal, implying that in this paper the
+underlying assumption is based on screening as opposed to signaling
+(see \cite{Rothschild.1976} and \cite{Wilson.1977}).
+
+The idea of using the ratios of wages and labor supply to estimate
+elasticities of substitution between high and low skill labor
+originates from \cite{Katz.1992} (hereafter, KM). In their seminal
+paper, KM find an elasticity of substituion between college and high
+school equivalents in the United States of around
+1.4. \cite{Card.2001} (hereafter, CL) build on the KM model but drop
+the assumption that, within skill groups, workers of different age
+groups are perfect substitutes. They find that elasticities of
+substitution between age groups are significant and in the range of
+4-6 in the United States, Canada and the United
+Kingdom. \cite{Blankenau.2011} (hereafter, BC) extend the KM model to
+allow for different elasticities of substitution in each
+industry. They identify the model using an IV-approach and find
+significant differences between industries.  \cite{Fitzenberger.2006}
+adress the issue of the dual education system for the case of Germany
+by introducing a third skill group. Their framework distinguishes
+between high skill workers (university degree), medium skill workers
+(vocational training degree) and low skill workers (neither university
+nor vocational training degree). Using occupation groups as a skill
+definition is not well explored in the
+literature. \cite{Orrenius.2007} use occupations in an investigation
+on the effect of immigration on wages. They distinguish three skill
+groups: professional, service-related and manual laborers. This
+differentiation interesting, however it is clearly tailored to
+evaluate immigration-based effects and doesn't translate well to more
+general applications. As to my knowledge, \cite{Orrenius.2007} is the
+only application of occupation groups as a skill identifier in a KM
+model.
+
+In this paper I argue that using occupation as a proxy for skill level
+describes a labor market with a dual education system much better than
+using an education-based skill classifier. I evaluate this claim by
+estimating a KM-style model with Swiss data, first using education and
+second using occupation as an identifier for skill level. My estimates
+for the elasticities of substitution confirm this hypothesis. Using
+education as a skill identifier I find no statistically significant
+elasticities, implying a true elasticity of either infinity (perfect
+substitutes) or an incompatibility with the theoretical model
+used. Using occupations as a classifier however, I find a
+statistically significant elasticity of substitution of around 2,
+which is in line with previous results from the United States. This
+result holds in a classic KM model and qualitatively does not change
+in a CL or BC extension.
+
+\section{Theoretical Framework}
+\label{sec:theory}
+
+\subsection{Basic Model}
+
+The following model is based on KM, however I allow for heterogeneity
+among sectors as in BC.  I start from some production function
+$Y_{i,t}=f(\cdot,L_{i,t})$, where the functional form of $f()$ and its
+inputs (other than labor $L_{i,t}$) are assumed to conform to standard
+regularity assumption but can otherwise be chosen freely. I assume
+that the labor input $L_{i,t}$ is a CES aggregate of two types of
+labor (high skill $S$ and low skill $U$):
+\begin{align}
+  \label{eq:ces}
+  L_{t}=\left( \theta_{u,i,t}U_{i,t}^{\rho_{i}} + \theta_{s,i,t}S_{i,t}^{\rho_{i}} \right)^{\frac{1}{\rho_{i}}},
+\end{align}
+with efficiency parameters $\theta_{u,i,t}$ and $\theta_{s,i,t}$ as
+well as CES aggregator $\rho_{i}$. Under the assumption of profit
+maximization and competitive markets I can then express the wage of
+low-skill workers as their marginal product:
+\begin{align}
+  \label{eq:wage1}
+  w_{u,i,t}&=\frac{\partial Y_{i,t}}{\partial U_{i,t}}=\frac{d
+             Y_{i,t}}{d L_{i,t}}\frac{d L_{i,t}}{d U_{i,t}} \\
+           & = \frac{d Y_{i,t}}{d L_{i,t}} \left(
+             \theta_{u,i,t}U_{i,t}^{\rho_{i}} + \theta_{s,i,t}S_{i,t}^{\rho_{i}}
+             \right)^{\frac{1}{\rho_{i}}-1}  \theta_{u,i,t}
+             U_{i,t}^{\rho_{i}-1}.
+\end{align}
+Similarly, the wage of high skill workers is given as:
+\begin{align}
+  \label{eq:wage2}
+  w_{s,i,t} = \frac{d Y_{i,t}}{d L_{i,t}} \left(
+  \theta_{u,i,t}U_{i,t}^{\rho_{i}} + \theta_{s,i,t}S_{i,t}^{\rho_{i}}
+  \right)^{\frac{1}{\rho_{i}}-1} 
+  \theta_{s,i,t}S_{i,t}^{\rho_{i}-1},
+\end{align}
+and the ratio between the two wage rates is:
+\begin{align}
+  \label{eq:wageratio}
+  \frac{w_{s,i,t}}{w_{u,i,t}}&= \frac{\theta_{s,i,t}}{\theta_{u,i,t}}\left( \frac{S_{i,t}}{U_{i,t}} \right)^{\rho_{i}-1}.
+\end{align}
+Now, let $\widetilde{w_{i,t}}\equiv \frac{w_{s,i,t}}{w_{u,i,t}}$,
+$\widetilde{\theta_{i,t}}\equiv
+\frac{\theta_{s,i,t}}{\theta_{u,i,t}}$, and
+$\widetilde{s_{i,t}}\equiv \frac{S_{i,t}}{U_{i,t}}$. Taking logs and
+plugging in the definition of the elasticity of substitution between
+skill levels $\sigma_{S,i}=\frac{1}{1-\rho_{i}}$ yields:
+\begin{align}
+  \label{eq:esteq1}
+  \log(\widetilde{w_{i,t}}) = \log(\widetilde{\theta_{i,t}}) - \frac{1}{\sigma_{S,i}}\log(\widetilde{s_{i,t}}).
+\end{align}
+
+\subsection{Imperfect Substitutability between Age Groups}
+
+CL extend the KM model by dropping the assumption that, within skill
+groups, workers of different age groups $j$ are perfect
+substitutes. Following their approach, I define the skill-specific
+labor supplies to be CES aggregates of age groups:
+\begin{equation}
+  \label{eq:2}
+  U_{i,t}=\left[ \sum_{j}(\alpha_{u,i,j}U_{i,j,t}^{\eta_{i}}) \right]^{\frac{1}{\eta_{i}}},
+\end{equation}
+and
+\begin{equation}
+  \label{eq:3}
+  S_{i,t}=\left[ \sum_{j}(\alpha_{s,i,j}S_{i,j,t}^{\eta_{i}}) \right]^{\frac{1}{\eta_{i}}},
+\end{equation}
+where $\alpha_{u,i,j}$ and $\alpha_{s,i,j}$ are the relative
+efficiency parameters for the age groups in each industry for low
+skilled workers and high skilled workers respectively and
+$\sigma_{A,i}=\frac{1}{1-\eta_{i}}$ is the elasticity of substitution
+between workers of different ages with the same skill level in each
+industry.
+
+The age group-specific wage rates of low-skill workers are now given
+by:
+\begin{align}
+  w_{u,i,j,t}&= \theta_{i,l,t}U_{i,t}^{\rho_{i}-1}\Psi_{i,t} \alpha_{u,i,j}U_{i,j,t}^{\eta_{i}-1}L_{i,t}^{1-\eta_{i}} \\
+             &=
+               \theta_{i,l,t}U_{t}^{\rho_{i}-\eta_{i}}\Psi_{i,t}\alpha_{u,i,j}U_{i,j,t}^{\eta_{i}-1},   \label{eq:5}
+\end{align}
+where
+\begin{equation}
+  \label{eq:6}
+  \Psi_{i,t}=\left( \theta_{i,l,t}U_{i,t}^{\rho_{i}}+\theta_{i,h,t}S_{i,t}^{\rho_{i}} \right)^{\frac{1}{\rho_{i}-1}}.
+\end{equation}
+Mirroring this result, high skill workers' wages are given by:
+\begin{equation}
+  \label{eq:7}
+  w_{s,i,j,t}=\theta_{i,h,t}S_{i,t}^{\rho_{i}-\eta_{i}}\Psi_{i,t} \alpha_{u,i,j}S_{i,j,t}^{\eta_{i}-1}.
+\end{equation}
+Thus, the wage ratio will be:
+\begin{equation}
+  \label{eq:8}
+  \frac{w_{s,i,j,t}}{w_{u,i,j,t}}=\frac{\theta_{i,h,t}}{\theta_{i,l,t}} \left( \frac{S_{i,t}}{U_{i,t}} \right)^{\rho_{i}-\eta_{i}}\frac{\alpha_{u,i,j}}{\alpha_{s,i,j}}\left( \frac{H_{i,j,t}}{L_{i,j,t}} \right)^{\eta_{i-1}}.
+\end{equation}
+Taking logs, substituting in $\sigma_{A,i}$ and $\sigma_{S,i}$ and
+adopting the tilde-notation from the previous section leads to a model
+for the observed wage gap between high and low skill workers:
+\begin{align}
+  \label{eq:9}
+  \log \left( \widetilde{w_{i,j,t}} \right) = \log \left(
+  \widetilde{\theta_{i,t}} \right) &+ \log \left(
+                                     \widetilde{\alpha_{i,j}} \right) + \left[ \left(
+                                     \frac{1}{\sigma_{A,i}} \right)-\left( \frac{1}{\sigma_{S,i}}
+                                     \right) \right] \log \left(\widetilde{s_{i,t}} \right)
+                                     \nonumber \\ &-
+                                                    \left( \frac{1}{\sigma_{A,i}} \right)\log \left(
+                                                    \widetilde{s_{i,j,t}} \right) + e_{i,j,t}
+\end{align}
+This model can be easily rearranged into a slightly more convenient
+form that allows us to estimate the elasticities directly:
+\begin{align}
+  \label{eq:10}
+  \log \left( \widetilde{w_{i,j,t}} \right) = \log \left(
+  \widetilde{\theta_{i,t}} \right) &+ \log \left(
+                                     \widetilde{\alpha_{i,j}} \right) +  \left(
+                                     \frac{1}{\sigma_{S,i}} \right) \log \left(\widetilde{s_{i,t}} \right)
+                                     \nonumber \\ &-
+                                                    \left( \frac{1}{\sigma_{A,i}} \right) \left[ \log \left(\widetilde{s_{i,j,t}} \right)- \log \left( \widetilde{s_{i,t}} \right) \right] + e_{i,j,t}
+\end{align}
+Note that by assuming perfect substitutability between age groups, the
+model collapses to the basic KM model presented in the previous
+section.
+
+\section{Estimation}
+Estimation of the basic model is straight forward. First, one has to
+assume some functional form for $\log(\widetilde{\theta_{i,t}})$. This
+is generally assumed to be a constant with a linear trend. While this
+assumption is not necessary, it makes the model simple and, as noted
+by BC, provides a convenient interpretation for the coefficient of the
+linear trend term in the form of the rate of skill-biased technical
+change. Especially in the comparison between industries this could be
+interesting. Given this assumption, equation \eqref{eq:esteq1} can be
+estimated using OLS as follows:
+\begin{align}
+  \label{eq:est1}
+  log(\tilde{w_{t}})=\beta_{0}+\beta_{1}t+\beta_{2}log(\tilde{s_{t}})+\varepsilon_{t},
+\end{align}
+where, as noted above, $\beta_{1}$ provides an estimate for the rate
+of skill-biased technical change and $\beta_{2}$ is an estimator for
+$-\frac{1}{\sigma_{S,i}}$. In order for the exogeneity assumption to
+hold we need to confirm that, within a period, wage ratios are indeed
+driven by skill shares and not the other way around, i.e. the wage
+ratio should not affect the skill share within a period. I argue that
+in the aggregate economy this is a plausible assumption, since the
+only way for the aggregate skill share to change is through different
+education (occupation) decisions or through migration. Both of these
+effects should usually take longer than one period to manifest. In the
+model with heterogeneous effects across sectors this assumption does
+not hold necessarily, however. This will be discussed further in the
+next subsection.
+  
+One major problem arises when trying to estimate equation
+\eqref{eq:10} from the model with imperfect substitutability between
+age groups: The modelled relationship between age-group-specific and
+aggregate labor supplies depends on the elasticity of substitution
+between age groups, which is one of the parameters I want to
+estimate. Therefore, I cannot use both types of labor supply in my
+model if I want consistent estimators of both elasticities. However,
+as shown by CL, it is possible to estimate the aggregate supply using
+a multi-step procedure. First, I estimate $\sigma_{A,i}$ using
+equation \eqref{eq:9}, without estimating $\sigma_{A,i}$. This is
+achieved by recognizing that a set of age group dummies absorbs the
+relative age group productivity effect
+$ \log \left( \widetilde{\alpha_{i,j}} \right)$ and a set of time
+dummies absorb the relative skill group productivity effect
+$ \log \left( \widetilde{\theta_{i,t}} \right)$ as well as any effects
+of aggregate relative supply
+$\log \left( \widetilde{s_{i,t}} \right)$. Thus, identification of
+$\frac{1}{\sigma_{A,i}}$ can be achieved by estimating the following
+model:
+\begin{equation}
+  \label{eq:11}
+  \log \left( \widetilde{w_{i,j,t}} \right) = J_{j} +
+  T_{t} - \frac{1}{\sigma^{A}_{i}}\log\left(
+    \widetilde{s_{i,j,t}} \right) + e_{i,j,t},
+\end{equation}
+where $J_{j}$ and $T_{t}$ are age and year fixed effects,
+respectively. With the estimates $\widehat{\frac{1}{\sigma_{i}^{A}}}$
+we can then estimate $\widehat{\alpha_{u,i,j}}$ and
+$\widehat{\alpha_{s,i,j}}$ by estimating the following models, derived
+from equations \eqref{eq:5} and \eqref{eq:7} respectively:
+\begin{equation}
+  \label{eq:12}
+  \log (w_{u,j,i,t}) + \widehat{\frac{1}{\sigma_{A,i}}}U_{i,j,t} = \log
+  \left( \theta_{u,i,t}U_{i,t}^{\rho_{i}-\eta_{i}}\Psi_{i,t} \right) + \log(\alpha_{u,i,j})
+\end{equation}
+
+\begin{equation}
+  \label{eq:13}
+  \log (w_{s,j,i,t}) + \widehat{\frac{1}{\sigma_{A,i}}}S_{i,j,t} = \log
+  \left( \theta_{s,i,t}S_{i,t}^{\rho_{i}-\eta_{i}}\Psi_{i,t} \right) + \log(\alpha_{s,i,j})
+\end{equation}
+The left hand side of these equations is observed or estimated in the
+previous step. The first term of the right hand side can be absorbed
+by a set of time dummies. Thus, we can estimate
+$\widehat{\alpha_{u,i,j}}$ and $\widehat{\alpha_{s,i,j}}$ as the
+coefficients of age group dummies in a regression of the left hand
+side terms on year and age group fixed effects. Given estimates for
+$\widehat{\alpha_{u,i,j}}$, $\widehat{\alpha_{s,i,j}}$ and
+$\widehat{\eta_{i}}$, I return to equations \eqref{eq:2} and
+\eqref{eq:3} to calculate the estimated aggregate supplies
+$\widehat{U_{i,t}}$ and $\widehat{S_{i,t}}$ which I can then use to
+estimate equation \eqref{eq:10} for every industry:
+\begin{align}
+  \label{eq:1}
+  \log(\widetilde{w_{i,j,t}}) = \beta_{0,i} + \beta_{1,i}T_{t} &+ \beta_{2,i}J_{j} +
+                                                                 \beta_{3,i}\log\left( \widetilde{\widehat{s_{i,t}}}\right)
+                                                                 \nonumber \\ &+
+                                                                                \beta_{4,i}\left[ \log\left(\widetilde{s_{i,j,t}}\right)-\log\left(\widetilde{\widehat{s_{i,t}}}\right)\right]
+                                                                                + \varepsilon_{i,j,t},
+\end{align}
+from which I can calculate $\sigma_{S,i}=-\frac{1}{\beta_{3,i}}$ and
+$\sigma_{A,i}=-\frac{1}{\beta_{4,i}}$. Additionally, $\beta_{1,i}$ can
+be interpreted as the rate of skill-biased technological change.
+
+\subsection{IV Approach}
+However, as mentioned above there is one more problem remaining: While
+this procedure works very well for the aggregated economy of a
+country, a possible endogeneity arises when estimating it for a single
+industry. It is reasonabe to assume that in the whole economy wage
+differentials react to changes in skill differentials but not the
+other way around, because the skill composition of the economy takes
+some time to change through education or international migration. The
+same is true for the age composition, which can only change very
+slowly through cohort effects or international migration. This is not
+necessarily true however for single industries within a country. If
+labor is at least partially mobile between sectors it is plausible
+that the skill and age composition of labor supply reacts to wage
+changes within the same period, leading to an endogeneity issue. To
+solve this issue, BC suggest an instrumental variable approach, using
+the aggregate skill ratio as an instrument for the industry skill
+ratio. As already discussed it is reasonable to assume that the
+aggregate skill ratio is fixed within a period, however by
+construction it is clearly correlated to the industry skill ratio
+. The same reasoning can be applied for industry and aggregate age
+specific ratios. Therefore, I use an instrumental variable approach
+for the following estimations: In equation \eqref{eq:11} I use
+$\frac{H_{j,t}}{L_{j,t}}$ as an instrument for
+$\frac{H_{i,j,t}}{L_{i,j,t}}$. In equation \eqref{eq:1} I use
+$\frac{\widehat{H_{t}}}{\widehat{L_{t}}}$ as an instrument for
+$\frac{\widehat{H_{i,t}}}{\widehat{L_{i,t}}}$ and
+$\frac{\frac{H_{j,t}}{L_{j,t}}}{\frac{\widehat{H_{t}}}{\widehat{L_{t}}}}$
+as an instrument for
+$\frac{\frac{H_{i,j,t}}{L_{i,j,t}}}{\frac{\widehat{H_{i,t}}}{\widehat{L_{i,t}}}}$. In
+both cases I estimate a two stage least squares (2SLS)
+model. \textcolor{red}{\emph{[to do: excess kurtosis analysis]}}
+\section{Data}
+\subsection{Switzerland} \label{sec:ch} All estimations for
+Switzerland are based on the Swiss Labor Force Survey (SLFS),
+conducted yearly (quarterly since 2010) by the Federal Statistical
+Office of Switzerland. I define a time period as spanning two years,
+in order to increase sample size within a period. The first time
+period covers 1992-1993, the last time period 2016-2017. I define
+seven five-year age groups, from 26-30 year-olds to 56-60
+year-olds. For the set of estimations using education as an identifier
+for skill-level, I define individuals whose highest completed
+educations are mandatory school, language stays, additional
+general-education schools or an apprenticeship as low skill. I define
+individuals who completed a university degree (including technical and
+pedagogical colleges) as high skill. I omit individuals that completed
+an education in addition to an apprenticeship, higher vocational
+education or the ``Gymnasium'' but did not complete a university
+degree. For the calculation of the size of the labor force $H_{i,j,t}$
+and $L_{i,j,t}$ I sum hours worked of all workers between the age of
+15 and 65 by sex, age group, year and skill level. I then divide hours
+worked of the high skill group by hours worked of the low skill group,
+omitting cases with 5 or less observations.  To calculate the wage
+gap, I remove observations with an hourly wage above 500 Swiss Francs
+or below 5 Swiss Francs. I only consider workers that are employed
+full time (ignoring part-time workers and self-employed). To estimate
+the wage gap, I separately regress hourly log wages on a skill level
+dummy, a gender dummy\footnote{Typically, in the literature the wage
+  gap is estimated separately for men and women or exclusively for
+  men. I do not do this due to sample size issues in the
+  industry-specific estimations. Certain combinations of age, industry
+  and gender yield very low observations, in some cases even 0
+  observations. However, the results for the aggregate economy do not
+  change in any significant way depending on which specification I
+  use.} and a linear age term in every time period, age group and
+industry. In the model without age-specific effects I do not split the
+sample into age groups but include a squared age term. As in CL, the
+inverse of the estimated variance of the coefficient for skill level
+is later used as weight in the models.
+\subsection{United States}
+\label{data_us}
+Estimations for the United States are based on the March CPS Extracts
+from 1980-2016 \citep{CenterforEconomicandPolicyResearch.2016}. Due to
+data irregularities (redefinition of occupation classification) in the
+first two years, I only use data from 1982-2016, again pooled in two
+year periods. For the set of estimations using education as an
+identifier for skill-level, I define individuals with exactly a
+Highschool degree as low-skill and individuals with exactly a college
+degree as high-skill. I omit individuals with less than a Highschool
+degree, those with ``some college'' and those with an ``advanced''
+degree. Calculation of the size of the labor force is identical is
+with the Swiss data (see \ref{sec:ch}). Calculation of the wage gap is
+based on weekly wages, where weekly wages below USD 50 are omitted. I
+only consider full time employed individuals. Estimation of the wage
+gap is almost identical as with Swiss data, however, I also control
+for race by including a ``non-white'' dummy.
+\subsection{Coding Issues}
+\label{issues}
+One major problem arises when attempting to replicate the distinction
+between Competence Levels in data from the United States. The
+Competence Levels are based on the ISCO-08 classification which is
+commonly used in European Data, however it is not used in the United
+States. The CPS uses its own classification for occupations which is
+based on the US census. As I am not aware of a classification that is
+similar to the Swiss Competence Levels in US data, I recode the CPS
+occupations into ISCO-08 occupations using crosswalks from the Bureau
+of Labor Statistics. However, this does not always lead to unique
+correspondences, i.e. a CPS occupation group might be identified as
+several ISCO occupation groups which can lead to conflicts when
+deciding on its Competence Level. More problematic is the fact that
+the CPS occupation classification has undergone several revisions
+during my observation period. Every revision requires an additional
+step of recoding which can lead to significant disturbances. If
+aggregate skill shares and wage ratios both change due to a revision,
+this makes identification of the elasticity impossible. We cannot
+disentangle the effect of the revision from the effect of actual skill
+changes in the economy. In order to correctly identify the effect of
+occupational changes in the United States, I would need a different
+classification of skill levels. However, in the absence of such a
+classification I still present the results of the model using
+Competence Levels, under the caveat that they are flawed and should
+not be given much weight.
+
+\newpage
+\section{Descriptive Evidence}
+First, I present graphical evidence on the relationship between
+relative employment and relative wages. Figure \ref{fig:shares1} shows
+these shares in Switzerland with the education-based skill
+classifier. The wage gap seems to be very constant over time, whereas
+the skill share has been increasing immensely since 2000. As discussed
+in Section \ref{intro}, this can most likely be attributed to the
+creation of the technical colleges and the accompanying redefinition
+of high-skilled workers. Since this is not an actual change in the
+underlying skill level of the workers, it is not surprising that this
+has not lead to a corresponding decrease in the wage gap.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Z:/OLG_CGE_Model/code/elasticities/7inds/aggr_shares_coll.png}
+  \caption{Skill Shares and Wage Ratios - Education - CH}
+  \label{fig:shares1}
+\end{figure}
+Figure \ref{fig:shares2} shows the same data but with occupation as
+identifier for skill. Here, the data looks to be much more in line
+with my hypothesis. The inverse relationship between wage gaps and
+skill gaps is not perfect, but clearly visible in several time
+periods.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Z:/OLG_CGE_Model/code/elasticities/7inds/aggr_shares_skill.png}
+  \caption{Skill Shares and Wage Ratios - Occupation - CH}
+  \label{fig:shares2}
+\end{figure}
+Changing focus to the United States, Figure \ref{fig:shares3} shows
+the skill shares and wage ratios between High School and College
+graduates. While both ratios are clearly trending upwards, one can
+still observe some negative relationship between the two, however this
+is hard to see from the graph.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Z:/OLG_CGE_Model/code/elasticities/7inds/aggr_shares_coll_us.png}
+  \caption{Skill Shares and Wage Ratios - Education - US}
+  \label{fig:shares3}
+\end{figure}
+Finally, using the Competence Level-classification of occupations,
+Figure \ref{fig:shares4} reveals the coding issues mentioned in
+section \ref{issues}. The stark drop of the skill share in 1982 can
+only be attributed to a change in the definition of occupations in the
+US data and an associated change in the way these occupations are
+translated to ISCO-08 and finally to competence levels. This issue is
+solved by only considering data from 1982 onward. A similar change
+happened in 2004. This is visible in the way both skill share and wage
+gap move in the same direction and probably one of the reasons for my
+conflicting results.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Z:/OLG_CGE_Model/code/elasticities/7inds/aggr_shares_skill_us.png}
+  \caption{Skill Shares and Wage Ratios - Occupation - US}
+  \label{fig:shares4}
+\end{figure}
+Figures \ref{fig:shares_ind1} - \ref{fig:shares_ind4} in the Appendix
+show the same graphs disaggregated by industry.
+
+
+Table \ref{tab:mapping} shows the share of education levels of the
+different competence levels. There is a clear correlation, however it
+is not as strong as one might expect.
+% Table generated by Excel2LaTeX from sheet 'Sheet1'
+\begin{table}[H]
+  \centering
+  \caption{Share of education levels in each competence level,
+    2016-2017}
+  \begin{tabular}{lllll}
+    \toprule
+    \multicolumn{1}{p{5.5em}}{Competence Level} & \multicolumn{1}{p{6.3em}}{No Vocational Education} & \multicolumn{1}{p{5.8em}}{Vocational Education} & \multicolumn{1}{p{4.5em}}{Higher Education} & \multicolumn{1}{p{5em}}{University} \\
+    \midrule
+    1     & 2.0   & 13.9  & 23.0  & 61.2 \\
+    2     & 4.2   & 39.2  & 35.1  & 21.4 \\
+    3     & 18.4  & 55.9  & 19.7  & 6.0 \\
+    4     & 46.2  & 38.3  & 12.5  & 3.1 \\
+    \bottomrule
+  \end{tabular}%
+  \label{tab:mapping}%
+\end{table}%
+\textcolor{red}{[some more descriptives to be added]}
+\section{Results}
+\subsection{Basic Model}
+First, I present the results for the KM model (aggregate economy,
+perfect substitution over age groups). The left-hand side of Table
+\ref{noage_main} lists the coefficients and standard
+errors\footnote{Due to the multi-step estimation procedure of the CL
+  model, all standard errors are based on a bootstrap over the
+  disaggregated sample with 1000 replications. As a robustness check I
+  present the results of the KM model with analytical standard errors
+  in Section \ref{robustness}} for Switzerland, where the first column
+uses education as a proxy for skill level and the second column uses
+occupation as a proxy for skill level. In this simple model, I do not
+find a statistically significant elasticity of substitution between
+workers with a university degree and those with an
+apprenticeship. This could mean that either these groups are perfect
+substitutes or that the classification does not approximate skill
+accurately. The estimated elasticity of substitution between workers
+with an occupation classified as high skill and those with an
+occupation classified as low skill is strikingly different,
+however. Here I estimate a statistically significant elasticity of
+2.037 (which corresponds to an estimated coefficient of roughly
+-0.49). Additionally I estimate the rate of skill-biased technical
+change to be roughly 3.5\% over a two year period.
+
+Repeating the estimation with US data yields very different
+results. The estimated elasticity of substitution between college and
+high school educated workers is statistically significant and around
+1.996 (corresponding to a coefficient of roughly -0.50).  As a point
+of reference, using the same model but older data, \cite{Katz.1992}
+find an elasticity of 1.41, \cite{Card.2001} find 2.41 (on a sample of
+only males, the estimate for both genders is lower) and
+\cite{Blankenau.2011} find 1.4. Using a different method,
+\cite{PerKrusell.2000} find an elasticity of 1.67. Thus, my estimates
+are slightly higher than the usual findings, however, I do use more
+recent data. Looking at the last column, the elasticity of
+substitution between occupations classified as high skill and those
+classified as low skill in the United States is estimated to be
+negative and statistically significant.  As this is a theoretical
+impossibility, it directly invalidates the underlying model. Since the
+same model is valid with an education-based skill definition, this
+finding suggests that the way I defined the occupation-based skill
+groups is not suitable for the American labor market. There are two
+reasons as to why this might be the case. Firstly, it might be that
+occupation definitions are simply not very important in the American
+labor market and should therefore not be used to approximate skill
+levels. Secondly, it is possible that the Swiss definition of
+Competence Levels does not translate to the American occupation
+definition. This effect is reinforced by the coding issues mentioned
+in section \ref{data_us}.
+
+\begin{table}[H]
+  \centering
+  \caption{Aggregate Economy Results - Perfect Substitution over Age
+    Groups}
+  \input{Z:/OLG_CGE_Model/code/elasticities/noage/main_ch.tex}
+  \label{noage_main}
+\end{table}%
+
+\subsection{Imperfect Substitutability between Age Groups}
+Allowing for imperfect substitution between different age groups
+within skill groups decreases the standard error of the education
+coefficient in Switzerland which further invalidates this definition
+of skill in Switzerland. It also increases the estimated elasticities
+in both Switzerland and the United States, implying that a part of the
+effect measured in the simple model can be captured by age
+effects. Indeed, the elasticities of substitution between age groups
+is statistically significant in Switzerland as well as the United
+States. Again, the estimates of 7.2 and 6.6, respectively, are on the
+higher end of previous results, but still plausible (CL find estimates
+between 4-6 for the US, UK and Canada).
+
+\begin{table}[H]
+  \centering
+  \caption{Aggregate Economy Results - Imperfect Substitution over Age
+    Groups}
+  \input{Z:/OLG_CGE_Model/code/elasticities/7inds/main_ch.tex}
+  \label{age_main}
+\end{table}%
+
+\subsection{Industry-Specific Results}
+\textcolor{red}{[IV: preliminary results, subject to change! First
+  stage results to be added.]}  Tables \ref{indresults_noage} and
+\ref{indresults_age} show the industry-specific estimates of the
+elasticities of substitution between skill levels for the US and
+Switzerland, without and with age effects. The industry-specific
+results for the USA (Education) are fairly imprecise. While the point
+estimates mostly are reasonable, the standard errors are fairly large
+leading to only few industries returning statistically significant
+results. The results for Switzerland (Education) are more
+precise. Only Construction and Health return statistically clearly
+insignificant estimates. Especially striking are the results for the
+Finance sector, for which the estimates are rather low and not
+significantly different from 1 (Cobb-Douglas case). This result is
+significant and robust over different specifications. This result is
+special insofar as it implies that high and low skill labor might be
+net complements, as opposed to net substitutes like in all other
+industries. (for the age and time trend results refer to tables
+\ref{indresults_trend_noage}, \ref{indresults_age} and
+\ref{indresults_trend_age} in the appendix)
+
+\begin{table}[H]
+  \centering
+  \caption{Industry Results - No Age Effects - Skill}
+  \input{Z:/OLG_CGE_Model/code/elasticities/noage/ind_skill.tex}
+  \label{indresults_noage}
+\end{table}%
+
+
+\begin{table}[H]
+  \centering
+  \caption{Industry Results - Age Effects - Skill}
+  \input{Z:/OLG_CGE_Model/code/elasticities/7inds/ind_skill.tex}
+  \label{indresults_age}
+\end{table}%
+
+\subsection{Robustness Analyses}
+\label{robustness}
+\textcolor{red}{Not finished yet}
+
+\section{Conclusion}
+From the results it is almost surprisingly clear, that the standard
+definition of skill levels is not suitable for countries with a dual
+education system like Switzerland. On the other hand, using the
+suggested occupation-based skill classification is not applicable to
+the United States. There are two different potential explanations for
+this observation. First, it is possible that the way education-based
+and occupation-based skill levels are defined is chosen wrong and
+doesn't translate well between the systems. For example, in some
+occupations it might be the case that a suitable signal for being
+high-skilled is additional vocational training, whereas a university
+degree might be considered too theoretical and does not signal high
+skill for a more practical task. Distinguishing these cases however is
+not straight-forward without further research in the area. One reason
+for the fact that the competence level distinction is so clearly
+invalidated in the US is that the recoding from the occupation
+classification used in the US data (CPS occupational titles) to the
+European ISCO is very cumbersome and sometimes impossible to do
+correctly. For example, according to the official crosswalks, the
+occupation ``Veterinary Assistants and Laboratory Animal Caretakers''
+in the US CPS data corresponds to either ``Veterinary technicians and
+assistants'' (high skill) or ``Pet groomers and animal care workers ''
+(low skill) in the ISCO. It is not possible to make the distinction
+between low and high skill workers in this case. There are many such
+cases which could lead to significant distortions. A different
+explanation for my findings is of theoretical nature. It is possible
+that the fundamental skill revealing mechanism is different between
+the United States and Switzerland, meaning that in the United States
+signalling is prevalent (agents choose to attend college based on
+their underlying skill level) whereas in Switzerland screening is
+prevalent (high skill workers self-select into occupations that
+include skill-intensive tasks). There is some anecdotal evidence that
+supports this claim, but further research in this area is required to
+make any conclusions.
+
+Whatever the underlying reason for my results is, it should be clear
+that any models of the Swiss economy with disaggregation on skill
+levels should pay attention to the definition of skill level. Blindly
+adopting definitions from US models could lead to misleading results
+or inconsistencies. I do not claim that competence levels are the best
+possible approximation for skill levels. There may be other suitable
+approximations that might perform better. One interesting example
+would be a task-based approach such as in, for example,
+\cite{SpitzOener.2006}. More research is also necessary in terms of
+classifying occupations in the United States correctly. A more
+realistic classification could solve my conflicting results, allow for
+better international comparisons and might even shed light on the
+underlying skill revealing mechanisms of different labor markets.
+
+
+\newpage
+\bibliography{references}
+\appendix
+\section{Appendix}
+% Table generated by Excel2LaTeX from sheet 'Sheet1'
+\begin{table}[H]
+  \centering
+  \caption{High Skill Occupations}
+  \begin{tabular}{rrp{18em}}
+    \toprule
+    \multicolumn{1}{l}{Competence Level} & \multicolumn{1}{l}{ISCO-08 Code} & \multicolumn{1}{l}{Occupation} \\
+    \midrule
+    1     & 1     & Commissioned armed forces officers \\
+                                         & 10    & Managers, nos \\
+                                         & 11    & Chief Executives, Senior Officials and Legislators \\
+                                         & 12    & Administrative and Commercial Managers \\
+                                         & 13    & Production and Specialized Services Managers \\
+                                         & 14    & Hospitality, retail and other services managers \\
+                                         & 20    & Professionals, nos \\
+                                         & 21    & Science and engineering professionals \\
+                                         & 22    & Health professionals \\
+                                         & 23    & Teaching professionals \\
+                                         & 24    & Business and administration professionals \\
+                                         & 25    & Information and communications technology professionals \\
+                                         & 26    & Legal, social and cultural professionals \\
+    \midrule
+    2     & 30    & Technicians and associate professionals, nos \\
+                                         & 31    & Science and engineering associate professionals \\
+                                         & 32    & Health associate professionals \\
+                                         & 33    & Business and administration associate professionals \\
+                                         & 34    & Legal, social, cultural and related associate professionals \\
+                                         & 35    & Information and communications technicians \\
+    \bottomrule
+  \end{tabular}%
+  \label{tab:occupations_high}%
+\end{table}%
+
+% Table generated by Excel2LaTeX from sheet 'Sheet1'
+\begin{table}[H]
+  \centering
+  \caption{Low Skill Occupations}
+  \begin{tabular}{rrp{20em}}
+    \toprule
+    \multicolumn{1}{l}{Competence Level} & \multicolumn{1}{l}{ISCO-08 Code} & \multicolumn{1}{l}{Occupation} \\
+    \midrule
+    3     & 2     & Non-commissioned armed forces officers \\
+                                         & 40    & Clerical support workers, nos \\
+                                         & 41    & General and keyboard clerks \\
+                                         & 42    & Customer services clerks \\
+                                         & 43    & Numerical and material recording clerks \\
+                                         & 44    & Other clerical support workers \\
+                                         & 50    & Service and sales workers, nos \\
+                                         & 51    & Personal service workers \\
+                                         & 52    & Sales workers \\
+                                         & 53    & Personal care workers \\
+                                         & 54    & Protective services workers \\
+                                         & 60    & Skilled agricultural, forestry and fishery workers, nos \\
+                                         & 61    & Market-oriented skilled agricultural workers \\
+                                         & 62    & Market-oriented skilled forestry, fishery and hunting workers \\
+                                         & 63    & Subsistence farmers, fishers, hunters and gatherers \\
+                                         & 70    & Craft and related trades workers, nos \\
+                                         & 71    & Building and related trades workers, excluding electricians \\
+                                         & 72    & Metal, machinery and related trades workers \\
+                                         & 73    & Handicraft and printing workers \\
+                                         & 74    & Electrical and electronic trades workers \\
+                                         & 75    & Food processing, wood working, garment and other craft and related trades workers \\
+                                         & 80    & Plant and machine operators and assemblers, nos \\
+                                         & 81    & Stationary plant and machine operators \\
+                                         & 82    & Assemblers \\
+                                         & 83    & Drivers and mobile plant operators \\
+    \midrule
+    4     & 3     & Armed forces occupations, other ranks \\
+                                         & 90    & Elementary occupations, nos \\
+                                         & 91    & Cleaners and helpers \\
+                                         & 92    & Agricultural, forestry and fishery labourers \\
+                                         & 93    & Labourers in mining, construction, manufacturing and transport \\
+                                         & 94    & Food preparation assistants \\
+                                         & 95    & Street and related sales and service workers \\
+                                         & 96    & Refuse workers and other elementary workers \\
+    \bottomrule
+  \end{tabular}%
+  \label{tab:occupations_low}%
+\end{table}%
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{gap_college.png}
+  \caption{Log-Wages and Wage Gap of College vs. High School}
+  \label{fig:gap_college}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{gap_skills.png}
+  \caption{Log-Wages and Wage Gap of Competence Levels}
+  \label{fig:gap_skills}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{agegroups.png}
+  \caption{Age Profiles of Wage Gaps}
+  \label{fig:gap_age}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{labor_aggregate.png}
+  \caption{Aggregate Relative Employment}
+  \label{fig:labor_aggregate}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{labor_ind.png}
+  \caption{Relative Employment by Industry}
+  \label{fig:labor_ind}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{labor_age_ind.png}
+  \caption{Relative Employment by Industry and Age}
+  \label{fig:labor_age_ind}
+\end{figure}
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Z:/OLG_CGE_Model/code/elasticities/7inds/laborwage_skill.png}
+  \caption{Skill Shares and Wage Ratios - Occupation - CH}
+  \label{fig:shares_ind1}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Z:/OLG_CGE_Model/code/elasticities/7inds/laborwage_college.png}
+  \caption{Skill Shares and Wage Ratios - Education - CH}
+  \label{fig:shares_ind2}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Z:/OLG_CGE_Model/code/elasticities/7inds/laborwage_college_us.png}
+  \caption{Skill Shares and Wage Ratios - Education - US}
+  \label{fig:shares_ind3}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Z:/OLG_CGE_Model/code/elasticities/7inds/laborwage_skill_us.png}
+  \caption{Skill Shares and Wage Ratios - Occupation - US}
+  \label{fig:shares_ind4}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Industry Results - Trend - No Age Effects}
+  \input{Z:/OLG_CGE_Model/code/elasticities/noage/ind_trend.tex}
+   \label{indresults_trend_noage}
+\end{table}%
+
+\begin{table}[H]
+  \centering
+  \caption{Industry Results - Age - Age Effects}
+  \input{Z:/OLG_CGE_Model/code/elasticities/7inds/ind_age.tex}
+   \label{indresults_age}
+\end{table}%
+
+\begin{table}[H]
+  \centering
+  \caption{Industry Results - Trend - Age Effects}
+  \input{Z:/OLG_CGE_Model/code/elasticities/7inds/ind_trend.tex}
+  \label{indresults_trend_age}
+\end{table}%
+
+%\begin{table}[H]
+%  \centering
+%  \caption{Industry Results Switzerland - Trend}
+%  \input{Z:/OLG_CGE_Model/code/elasticities/7inds/ind_trend_ch.tex}
+%  \label{indresults_trend_ch}
+%\end{table}%
+
+
+\end{document}

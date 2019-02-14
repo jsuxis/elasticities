@@ -1,0 +1,16 @@
+\beamer@sectionintoc {1}{Introduction}{2}{0}{1}
+\beamer@subsectionintoc {1}{1}{Motivation}{2}{0}{1}
+\beamer@subsectionintoc {1}{2}{Research Questions}{3}{0}{1}
+\beamer@subsectionintoc {1}{3}{Literature}{7}{0}{1}
+\beamer@sectionintoc {2}{Theory and Estimation}{8}{0}{2}
+\beamer@subsectionintoc {2}{1}{Theory}{8}{0}{2}
+\beamer@subsectionintoc {2}{2}{Estimation}{10}{0}{2}
+\beamer@subsectionintoc {2}{3}{Industry-Specific Effects}{11}{0}{2}
+\beamer@subsectionintoc {2}{4}{Estimation - Industry}{12}{0}{2}
+\beamer@subsectionintoc {2}{5}{IV}{13}{0}{2}
+\beamer@sectionintoc {3}{Data}{14}{0}{3}
+\beamer@subsectionintoc {3}{1}{Data}{14}{0}{3}
+\beamer@sectionintoc {4}{Descriptive Evidence}{18}{0}{4}
+\beamer@sectionintoc {5}{Results}{23}{0}{5}
+\beamer@subsectionintoc {5}{1}{Aggregate}{23}{0}{5}
+\beamer@sectionintoc {6}{Conclusion}{26}{0}{6}
