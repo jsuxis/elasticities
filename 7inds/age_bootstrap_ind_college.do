@@ -119,6 +119,7 @@ program define cardlemieuxind, rclass
 		return scalar sigmaA_`i' = `sigA_`i''
 		return scalar trend_`i' = `r3'
 		return scalar F_`i' = F_`i'
+		return scalar sigmaA2_`i' = 1/sig_`i'
 		}
 	
 	restore

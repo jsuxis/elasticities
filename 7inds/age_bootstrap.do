@@ -16,7 +16,7 @@ program define cardlemieux, rclass
 	save `end', replace
 	use `start', clear
 	
-	forval y=1992(1)2016 {
+	forval y=1992(2)2016 {
 		forval a=2/8 {
 			reg loglohn i.skilled i.geschl age if jahr==`y' & altersgr==`a', robust
 			mat covar_`y'_`a' = e(V)
@@ -54,13 +54,14 @@ program define cardlemieux, rclass
 	// the following only works for given amount of t, adjust submatrices as needed
 	reg outcome_u i.jahr ibn.altersgr, nocon
 	mat alpha = e(b)
-	mat alpha = alpha[1,26..32]
+	mat alpha = alpha[1,14..20]
 	mat list alpha
 	reg outcome_s i.jahr ibn.altersgr, nocon
 	mat beta = e(b)
-	mat beta = beta[1,26..32]
+	mat beta = beta[1,14..20]
 	mat list beta
-	scalar sig = 1/`sigA'
+	scalar sig = `sigA'
+	local sigA2 = 1/sig
 	
 	rename stundeges20 h_l
 	rename stundeges21 h_h
@@ -96,6 +97,7 @@ program define cardlemieux, rclass
 	return scalar sigmaE = `sigE'
 	return scalar sigmaA = `sigA'
 	return scalar trend = `r3'
+	return scalar sigmaA2 = `sigA2'
 	restore
 end
 

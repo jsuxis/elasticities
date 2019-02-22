@@ -17,7 +17,7 @@ program define cardlemieuxind, rclass
 	use `start', clear
 		
 	forval i=1/7 {
-		forval y=1992(1)2016 {
+		forval y=1992(2)2016 {
 			forval a=2/8 {
 				reg loglohn i.skilled i.geschl age if jahr==`y' & altersgr==`a' & ind==`i', robust
 				mat covar_`y'_`a'_`i' = e(V)
@@ -68,11 +68,12 @@ program define cardlemieuxind, rclass
 		// the following only works for given amount of t, adjust submatrices as needed
 		reg outcome_u i.jahr ibn.altersgr if ind == `i', nocon
 		mat alpha_`i' = e(b)
-		mat alpha_`i' = alpha_`i'[1,26..32]
+		mat alpha_`i' = alpha_`i'[1,14..20]
 		reg outcome_s i.jahr ibn.altersgr if ind == `i', nocon
 		mat beta_`i' = e(b)
-		mat beta_`i' = beta_`i'[1,26..32]
+		mat beta_`i' = beta_`i'[1,14..20]
 		scalar sig_`i' = `sigA_`i''
+		local sigA2_`i' = sig_`i'
 		}
 	
 	rename stundeges20 h_l
@@ -125,7 +126,7 @@ program define cardlemieuxind, rclass
 		return scalar trend_`i' = `r3'
 		return scalar sigE_coll_`i' = `sigE_`i''
 		return scalar sigA_coll_`i' = `sigA_`i''
-		return scalar sigA2_coll_`i' = 1/sig_`i'
+		return scalar sigmaA2_`i' = 1/sig_`i'
 		return scalar Trend_`i' = `r3'		
 		return scalar F1_`i' = F1_`i'
 		return scalar F_`i' = F_`i'
@@ -141,7 +142,7 @@ mata:
 	function matacode_ind1()
 	{
 		upper = 1 
-		lower = 25
+		lower = 13
 		alpha = st_matrix("alpha_1")
 		beta = st_matrix("beta_1")
 		L_j = st_data((upper, lower),"h_l*")
@@ -170,8 +171,8 @@ mata:
 	
 		function matacode_ind2()
 	{
-		upper = 1+(2-1)*25
-		lower = 2*25
+		upper = 1+(2-1)*13
+		lower = 2*13
 		alpha = st_matrix("alpha_2")
 		beta = st_matrix("beta_2")
 		L_j = st_data((upper, lower),"h_l*")
@@ -199,8 +200,8 @@ mata:
 		}
 	function matacode_ind3()
 	{
-		upper = 1+(3-1)*25
-		lower = 3*25
+		upper = 1+(3-1)*13
+		lower = 3*13
 		alpha = st_matrix("alpha_3")
 		beta = st_matrix("beta_3")
 		L_j = st_data((upper, lower),"h_l*")
@@ -228,8 +229,8 @@ mata:
 		}
 	function matacode_ind4()
 	{
-		upper = 1+(4-1)*25
-		lower = 4*25
+		upper = 1+(4-1)*13
+		lower = 4*13
 		alpha = st_matrix("alpha_4")
 		beta = st_matrix("beta_4")
 		L_j = st_data((upper, lower),"h_l*")
@@ -257,8 +258,8 @@ mata:
 		}
 	function matacode_ind5()
 	{
-		upper = 1+(5-1)*25
-		lower = 5*25
+		upper = 1+(5-1)*13
+		lower = 5*13
 		alpha = st_matrix("alpha_5")
 		beta = st_matrix("beta_5")
 		L_j = st_data((upper, lower),"h_l*")
@@ -286,8 +287,8 @@ mata:
 		}
 	function matacode_ind6()
 	{
-		upper = 1+(6-1)*25
-		lower = 6*25
+		upper = 1+(6-1)*13
+		lower = 6*13
 		alpha = st_matrix("alpha_6")
 		beta = st_matrix("beta_6")
 		L_j = st_data((upper, lower),"h_l*")
@@ -315,8 +316,8 @@ mata:
 		}
 	function matacode_ind7()
 	{
-		upper = 1+(7-1)*25
-		lower = 7*25
+		upper = 1+(7-1)*13
+		lower = 7*13
 		alpha = st_matrix("alpha_7")
 		beta = st_matrix("beta_7")
 		L_j = st_data((upper, lower),"h_l*")

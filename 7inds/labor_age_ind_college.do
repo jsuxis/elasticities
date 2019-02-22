@@ -1,5 +1,5 @@
 // Put correct path here!
-cd Z:\OLG_CGE_Model\code\elasticities\7inds
+*cd Z:\OLG_CGE_Model\code\elasticities\7inds
 
 cap restore
 use Datensatz1991_2017.dta, clear
@@ -23,7 +23,7 @@ drop if jahr2==.
 rename jahr2 jahr
 
 replace BQU2=BQU1 if jahr==1991
-recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1991
+*recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1995
 
 gen skilled = .
 replace skilled = .
@@ -50,7 +50,7 @@ preserve
 collapse (sum) stundeges2 (count) n=stundeges2 /*[pw=gew]*/, by(geschl altersgr skilled jahr ind)
 reshape wide stundeges2 n, i(jahr geschl altersgr ind) j(skilled)
 replace stundeges21 = 0 if n1 <5 | n1==.
-drop if n0<=5 | n1<=5 | n0==. | n1==.
+*drop if n0<=5 | n1<=5 | n0==. | n1==.
 
 gen labor = stundeges21 / stundeges20
 

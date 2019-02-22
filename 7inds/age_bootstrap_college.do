@@ -61,6 +61,7 @@ program define cardlemieux, rclass
 	mat beta = beta[1,14..20]
 	mat list beta
 	scalar sig = `sigA'
+	local sigA2 = 1/sig
 	
 	rename stundeges20 h_l
 	rename stundeges21 h_h
@@ -95,6 +96,7 @@ program define cardlemieux, rclass
 	return scalar sigmaE = `sigE'
 	return scalar sigmaA = `sigA'
 	return scalar trend = `r3'
+	return scalar sigmaA2 = `sigA2'
 	restore
 end
 

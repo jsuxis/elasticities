@@ -1,13 +1,13 @@
 // Put correct path here!
-cd Z:\OLG_CGE_Model\code\elasticities\7inds
-local reps = 5
+cd C:\Users\buchma04\Dropbox\elasticities\7inds
+local reps = 100
 
 * (1) College
 cap restore
 use Datensatz1991_2017.dta, clear
 
 replace BQU2=BQU1 if jahr==1991
-recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1991
+*recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1995
 
 gen skilled = .
 replace skilled = .
@@ -54,21 +54,31 @@ save bootstrap_input_college.dta, replace
 
 // Calculate Skill Shares
 do labor_age_college.do
-do labor_age_college_ind.do
+do labor_age_ind_college.do
 	
 use bootstrap_input_college.dta, clear
-keep if altersgr>1 &altersgr<9
-keep if jahr >=1992 & jahr<=2016
+*keep if altersgr>1 &altersgr<9
+*keep if jahr >=1992 & jahr<=2016
 do age_bootstrap_college.do
-bootstrap sigeE_college = r(sigmaE) sigA_college = r(sigmaA) Trend = r(trend), rep(`reps') : cardlemieux
+bootstrap sigeE_college = r(sigmaE) sigA_college = r(sigmaA) Trend = r(trend) sigA2 = r(sigmaA2), rep(`reps') : cardlemieux
 estimates store E
 matrix betas = e(b)
 matrix ses = e(se)
 matrix results = (betas\ses)
 mat list results
 
+// Industry-Specific Estimations
 do age_bootstrap_ind_college.do
-bootstrap sigE_coll_1=r(sigmaE_1) sigA_coll_1=r(sigmaA_1) sigE_coll_2=r(sigmaE_2) sigA_coll_2=r(sigmaA_2) sigE_coll_3=r(sigmaE_3) sigA_coll_3=r(sigmaA_3) sigE_coll_4=r(sigmaE_4) sigA_coll_4=r(sigmaA_4) sigE_coll_5=r(sigmaE_5) sigA_coll_5=r(sigmaA_5) sigE_coll_6=r(sigmaE_6) sigA_coll_6=r(sigmaA_6) sigE_coll_7=r(sigmaE_7) sigA_coll_7=r(sigmaA_7) Trend_1 = r(trend_1) Trend_2 = r(trend_2) Trend_3 = r(trend_3) Trend_4 = r(trend_4) Trend_5 = r(trend_5) Trend_6 = r(trend_6) Trend_7 = r(trend_7), rep(`reps'): cardlemieuxind
+// Save F-Stats
+quietly cardlemieuxind
+mat f_coll = (0)
+forval i=1/7 {
+	mat f_coll = (f_coll,F_`i')
+	}
+mat f_coll = f_coll[1,2..8]
+mat colnames f_coll = sigE_coll_1 sigE_coll_2 sigE_coll_3 sigE_coll_4 sigE_coll_5 sigE_coll_6 sigE_coll_7
+
+bootstrap sigE_coll_1=r(sigmaE_1) sigA_coll_1=r(sigmaA_1) sigA2_coll_1 = r(sigmaA2_1) sigE_coll_2=r(sigmaE_2) sigA_coll_2=r(sigmaA_2) sigA2_coll_2 = r(sigmaA2_2) sigE_coll_3=r(sigmaE_3) sigA_coll_3=r(sigmaA_3) sigA2_coll_3 = r(sigmaA2_3) sigE_coll_4=r(sigmaE_4) sigA_coll_4=r(sigmaA_4) sigA2_coll_4 = r(sigmaA2_4) sigE_coll_5=r(sigmaE_5) sigA_coll_5=r(sigmaA_5) sigA2_coll_5 = r(sigmaA2_5) sigE_coll_6=r(sigmaE_6) sigA_coll_6=r(sigmaA_6) sigA2_coll_6 = r(sigmaA2_6) sigE_coll_7=r(sigmaE_7) sigA_coll_7=r(sigmaA_7) sigA2_coll_7 = r(sigmaA2_7) Trend_1 = r(trend_1) Trend_2 = r(trend_2) Trend_3 = r(trend_3) Trend_4 = r(trend_4) Trend_5 = r(trend_5) Trend_6 = r(trend_6) Trend_7 = r(trend_7), rep(`reps'): cardlemieuxind
 estimates store F
 matrix betasi = e(b)
 matrix sesi = e(se)
@@ -130,7 +140,7 @@ do labor_age_ind.do
 use bootstrap_input.dta, clear
 keep if altersgr>1 &altersgr<9
 do age_bootstrap.do
-bootstrap sigeE_college = r(sigmaE) sigA_college = r(sigmaA) Trend = r(trend), rep(`reps') : cardlemieux
+bootstrap sigeE_college = r(sigmaE) sigA_college = r(sigmaA) Trend = r(trend) sigA2 = r(sigmaA2), rep(`reps') : cardlemieux
 estimates store G
 matrix betas = e(b)
 matrix ses = e(se)
@@ -139,8 +149,18 @@ mat list results2
 matrix fullresults = (results,results2)
 mat list fullresults
 
+// Industry-Specific Estimates
 do age_bootstrap_ind.do
-bootstrap sigE_coll_1=r(sigmaE_1) sigA_coll_1=r(sigmaA_1) sigE_coll_2=r(sigmaE_2) sigA_coll_2=r(sigmaA_2) sigE_coll_3=r(sigmaE_3) sigA_coll_3=r(sigmaA_3) sigE_coll_4=r(sigmaE_4) sigA_coll_4=r(sigmaA_4) sigE_coll_5=r(sigmaE_5) sigA_coll_5=r(sigmaA_5) sigE_coll_6=r(sigmaE_6) sigA_coll_6=r(sigmaA_6) sigE_coll_7=r(sigmaE_7) sigA_coll_7=r(sigmaA_7) Trend_1 = r(trend_1) Trend_2 = r(trend_2) Trend_3 = r(trend_3) Trend_4 = r(trend_4) Trend_5 = r(trend_5) Trend_6 = r(trend_6) Trend_7 = r(trend_7), rep(`reps'): cardlemieuxind
+// Save F-Stats
+quietly cardlemieuxind
+mat f_skill = (0)
+forval i=1/7 {
+	mat f_skill = (f_skill,F_`i')
+	}
+mat f_skill = f_skill[1,2..8]
+mat colnames f_skill = sigE_coll_1 sigE_coll_2 sigE_coll_3 sigE_coll_4 sigE_coll_5 sigE_coll_6 sigE_coll_7
+
+bootstrap sigE_coll_1=r(sigmaE_1) sigA_coll_1=r(sigmaA_1) sigA2_coll_1 = r(sigmaA2_1) sigE_coll_2=r(sigmaE_2) sigA_coll_2=r(sigmaA_2) sigA2_coll_2 = r(sigmaA2_2) sigE_coll_3=r(sigmaE_3) sigA_coll_3=r(sigmaA_3) sigA2_coll_3 = r(sigmaA2_3) sigE_coll_4=r(sigmaE_4) sigA_coll_4=r(sigmaA_4) sigA2_coll_4 = r(sigmaA2_4) sigE_coll_5=r(sigmaE_5) sigA_coll_5=r(sigmaA_5) sigA2_coll_5 = r(sigmaA2_5) sigE_coll_6=r(sigmaE_6) sigA_coll_6=r(sigmaA_6) sigA2_coll_6 = r(sigmaA2_6) sigE_coll_7=r(sigmaE_7) sigA_coll_7=r(sigmaA_7) sigA2_coll_7 = r(sigmaA2_7) Trend_1 = r(trend_1) Trend_2 = r(trend_2) Trend_3 = r(trend_3) Trend_4 = r(trend_4) Trend_5 = r(trend_5) Trend_6 = r(trend_6) Trend_7 = r(trend_7), rep(`reps'): cardlemieuxind
 estimates store H
 matrix betasi = e(b)
 matrix sesi = e(se)

@@ -1,5 +1,5 @@
 // Put correct path here!
-cd Z:\OLG_CGE_Model\code\elasticities\noage
+cd C:\Users\buchma04\Dropbox\elasticities\noage
 // Bootstrap repetitions, test with low number, then increase to >100
 local reps = 100
 
@@ -19,13 +19,13 @@ replace skilled = 1 if BQU2 == 10
 drop if skilled ==.
 *gen skilled = komp > 2
 
+keep if age >= 20 & age <= 65
 drop if lohn == . | lohn < 0
 drop if lohn >= 500
 drop if lohn <= 5
 drop if vollzeit != 1
 drop if angestellt != 1
 
-drop if BMU3==1
 gen ind = .
 replace ind = 1 if BMU3 >=2 & BMU3<=5
 replace ind = 2 if BMU3 >= 11 & BMU3 <= 13
@@ -58,9 +58,10 @@ save bootstrap_input_college.dta, replace
 
 // Calculate Skill Shares
 do labor_age_college.do
-do labor_age_college_ind.do
+do labor_age_ind_college.do
 	
 use bootstrap_input_college.dta, clear
+keep if altersgr>1 &altersgr<9
 // Update the program
 do age_bootstrap_college.do
 // Run the bootstrap
@@ -143,7 +144,7 @@ do labor_age.do
 do labor_age_ind.do
 
 use bootstrap_input.dta, clear
-
+keep if altersgr>1 &altersgr<9
 // Update Program
 do age_bootstrap.do
 // Run Bootstrap
@@ -161,12 +162,12 @@ mat list fullresults
 do age_bootstrap_ind.do
 // Save F-Stats
 quietly cardlemieuxind
-mat f_skill_us = (0)
+mat f_skill = (0)
 forval i=1/7 {
-	mat f_skill_us = (f_skill_us,F_`i')
+	mat f_skill = (f_skill,F_`i')
 	}
-mat f_skill_us = f_skill_us[1,2..8]
-mat colnames f_skill_us = sigE_coll_1 sigE_coll_2 sigE_coll_3 sigE_coll_4 sigE_coll_5 sigE_coll_6 sigE_coll_7
+mat f_skill = f_skill[1,2..8]
+mat colnames f_skill = sigE_coll_1 sigE_coll_2 sigE_coll_3 sigE_coll_4 sigE_coll_5 sigE_coll_6 sigE_coll_7
 
 bootstrap sigE_coll_1=r(sigE_coll_1) Trend_1=r(Trend_1) sigE_coll_2=r(sigE_coll_2) Trend_2=r(Trend_2) sigE_coll_3=r(sigE_coll_3) Trend_3=r(Trend_3) sigE_coll_4=r(sigE_coll_4) Trend_4=r(Trend_4) sigE_coll_5=r(sigE_coll_5) Trend_5=r(Trend_5) sigE_coll_6=r(sigE_coll_6) Trend_6=r(Trend_6) sigE_coll_7=r(sigE_coll_7) Trend_7=r(Trend_7), verbose rep(`reps'): cardlemieuxind
 estimates store H2

@@ -1,5 +1,5 @@
 // Put correct path here!
-cd Z:\OLG_CGE_Model\code\elasticities\7inds
+*cd Z:\OLG_CGE_Model\code\elasticities\7inds
 
 cap restore
 use Datensatz1991_2017.dta, clear
@@ -27,7 +27,7 @@ rename jahr2 jahr
 
 gen skilled = komp > 2
 
-recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1995
+*recode BQU2 (2=12) (3=4) (4=5) (5=6) if jahr<=1995
 
 keep if age >= 15 & age <= 65
 drop if stundeges2 == . | stundeges2 < 0
